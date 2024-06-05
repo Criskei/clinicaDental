@@ -156,7 +156,7 @@ const borrarUsuario = (id) => {
                                                 </div>
                                                 </Link> -->
 
-                                                <Link :href="'null'">
+                                                <Link :href="''">
                                                 <div
                                                     class="flex w-fit cursor-pointer px-2 py-1 border border-indigo-300 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-300 ease-in-out">
                                                     <p> Ver </p>
