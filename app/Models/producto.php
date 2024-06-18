@@ -16,7 +16,7 @@ class producto extends Model
 
     public function citas(): BelongsToMany
     {
-        return $this->belongsToMany(cita::class, 'citas_productos', 'producto_id', 'cita_id');
+        return $this->belongsToMany(cita::class, 'citas_productos', 'producto_id', 'cita_id')->withPivot('cantidad', 'activo');
     }
     public function categoria(): BelongsTo
     {
@@ -24,10 +24,10 @@ class producto extends Model
     }
     public function tratamientos(): BelongsToMany
     {
-        return $this->belongsToMany(tratamiento::class, 'productos_tratamientos', 'producto_id', 'tratamiento_id');
+        return $this->belongsToMany(tratamiento::class, 'productos_tratamientos', 'producto_id', 'tratamiento_id')->withPivot('cantidad');
     }
     public function proveedores(): BelongsToMany
     {
-        return $this->belongsToMany(proveedor::class);
+        return $this->belongsToMany(proveedor::class, 'productos_proveedores', 'producto_id', 'proveedor_id')->withPivot('precio', 'cantidad', 'fecha_entrada', 'fecha_vencimiento');
     }
 }

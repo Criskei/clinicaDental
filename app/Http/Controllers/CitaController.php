@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\cita;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class CitaController extends Controller
 {
@@ -12,7 +13,8 @@ class CitaController extends Controller
      */
     public function index()
     {
-        //
+        $citas = cita::with('paciente.usuario', 'dentista.usuario', 'estado')->get();
+        return Inertia::render('Admi/Citas', ['citas' => $citas]);
     }
 
     /**
@@ -34,9 +36,36 @@ class CitaController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(cita $cita)
+    public function show($id)
     {
-        //
+        $cita = cita::with('paciente.usuario', 'dentista.usuario', 'estado')->find($id);
+
+        $pagos = $cita->pagos()
+            ->with([
+                'metodo_pago',
+                'tipo_pago'
+            ])
+            ->get();
+
+        $tratamientos = $cita->citas_historiales()
+            ->with([
+                'historial_medico.tratamiento',
+                'historial_medico.diente',
+                'historial_medico.receta_medica',
+                'historial_medico.estado',
+                'historial_medico.tipo_historial'
+            ])
+            ->get();
+
+
+        $productos = $cita->productos()->get();
+
+        return Inertia::render('Admi/CitaInfo', [
+            'cita' => $cita,
+            'pagos' => $pagos,
+            'tratamientos' => $tratamientos,
+            'productos' => $productos
+        ]);
     }
 
     /**

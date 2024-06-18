@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CitaController;
 use App\Http\Controllers\DentistaController;
 use App\Http\Controllers\PacienteController;
 use App\Http\Controllers\ProductoController;
@@ -40,10 +41,25 @@ Route::get('/pacienteEdit/{id}', [PacienteController::class, 'edit'])
 Route::get('/dentistas', [DentistaController::class, 'index'])
     ->middleware(['auth', 'verified'])->name('dentista.index');
 
+Route::get('/dentista/{id}', [DentistaController::class, 'show'])
+    ->middleware(['auth', 'verified'])->name('dentista.ver');
+
 Route::get('/productos', [ProductoController::class, 'index'])
     ->middleware(['auth', 'verified'])->name('producto.index');
 
+Route::get('/producto/{id}', [ProductoController::class, 'show'])
+    ->middleware(['auth', 'verified'])->name('producto.ver');
+
+Route::get('/productoEdit', [ProductoController::class, 'index'])
+    ->middleware(['auth', 'verified'])->name('producto.editar');
+
 Route::get('/proveedores', [ProveedorController::class, 'index'])
     ->middleware(['auth', 'verified'])->name('proveedor.index');
+
+Route::get('/citas', [CitaController::class, 'index'])
+    ->middleware(['auth', 'verified'])->name('cita.index');
+
+Route::get('/cita/{id}', [CitaController::class, 'show'])
+    ->middleware(['auth', 'verified'])->name('cita.ver');
 
 require __DIR__ . '/auth.php';

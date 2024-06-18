@@ -13,9 +13,7 @@ class ProductoController extends Controller
      */
     public function index()
     {
-        $productos = producto::join('categorias', 'productos.categoria_id', '=', 'categorias.categoria_id')
-            ->select('*')
-            ->get();
+        $productos = producto::with('categoria')->get();
         return Inertia::render('Admi/Producto', ['productos' => $productos]);
     }
 
@@ -38,9 +36,24 @@ class ProductoController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(producto $producto)
+    public function show($id)
     {
-        //
+        $producto = producto::with('categoria')->find($id);
+        $categoria = $producto->categoria;
+
+        $proveedores = $producto->proveedores()->get();
+
+        $tratamientos = $producto->tratamientos()->get();
+
+        $citas = $producto->citas()->get();
+
+        return Inertia::render('Admi/ProductoInfo', [
+            'producto' => $producto,
+            'categoria' => $categoria,
+            'proveedores' => $proveedores,
+            'tratamientos' => $tratamientos,
+            'citas' => $citas
+        ]);
     }
 
     /**

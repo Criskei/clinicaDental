@@ -17,9 +17,7 @@ class PacienteController extends Controller
      */
     public function index()
     {
-        $pacientes = paciente::join('usuarios', 'pacientes.usuario_id', '=', 'usuarios.usuario_id')
-            ->select('*')
-            ->get();
+        $pacientes = paciente::with('usuario')->get();
         return Inertia::render('Admi/Paciente', ['pacientes' => $pacientes]);
     }
 
@@ -44,27 +42,54 @@ class PacienteController extends Controller
      */
     public function show($id)
     {
-        $usuario = User::join('pacientes', 'usuarios.usuario_id', '=', 'pacientes.usuario_id')
-            ->where('paciente_id', $id)
-            ->first();
-        $paciente = paciente::find($id);
+        $paciente = Paciente::with('usuario')->find($id);
 
-        $query = historiales_medico::where('paciente_id', $id)
-            ->with('paciente', 'dentista.usuario', 'tratamiento', 'diente', 'receta_medica', 'estado', 'tipo_historial', 'citas_historiales');
+        if ($paciente) {
+            $usuario = $paciente->usuario;
 
-        //dd($query->toSql(), $query->getBindings());
+            $tratamientos = $paciente->historiales_medicos()
+                ->with([
+                    'paciente',
+                    'dentista.usuario',
+                    'tratamiento',
+                    'diente',
+                    'receta_medica',
+                    'estado',
+                    'tipo_historial',
+                    'citas_historiales'
+                ])
+                ->get();
 
-        $tratamientos = $query->get();
+            $citas = $paciente->citas()
+                ->with([
+                    'dentista.usuario',
+                    'estado',
+                    'citas_historiales.historial_medico.tratamiento'
+                ])
+                ->get();
 
-        $citas = cita::where('paciente_id', $id)
-            ->with('dentista.usuario', 'estado', 'citas_historiales.historial_medico.tratamiento')
-            ->get();
+            $documentos = $paciente->documentos_clinicos()
+                ->with([
+                    'dentista.usuario',
+                    'categoria_documento'
+                ])
+                ->get();
+        } else {
+            // Manejar el caso en que el paciente no sea encontrado
+            $usuario = null;
+            $paciente = null;
+            $tratamientos = collect();
+            $citas = collect();
+            $documentos = collect();
+        }
+
 
         return Inertia::render('Admi/PacienteInfo', [
             'usuario' => $usuario,
             'paciente' => $paciente,
             'tratamientos' => $tratamientos,
-            'citas' => $citas
+            'citas' => $citas,
+            'documentos' => $documentos
         ]);
     }
 
